@@ -10,10 +10,10 @@ from datetime import date as date_type
 app = FastAPI(title="Unemployment Prediction API",
               description="API to predict unemployment using a BigQuery ML model")
 
-# BigQuery configuration
-PROJECT_ID = "msds434finalprojectmiguswong"
-DATASET_ID = "blsdata"
-MODEL_ID = "automl_unempl"
+# BigQuery configuration - use environment variables if available
+PROJECT_ID = os.environ.get("PROJECT_ID", "msds434finalprojectmiguswong")
+DATASET_ID = os.environ.get("DATASET_ID", "blsdata")
+MODEL_ID = os.environ.get("MODEL_ID", "automl_unempl")
 
 class PredictionRequest(BaseModel):
     series_id: str = Field(..., description="BLS Series ID")
@@ -37,10 +37,39 @@ def read_root():
 def health_check():
     return {"status": "healthy"}
 
+@app.get("/auth-test")
+def auth_test():
+    """Test authentication with BigQuery"""
+    try:
+        # Initialize BigQuery client without explicit credentials
+        # In Cloud Run, this will use the service account assigned to the service
+        client = bigquery.Client(project=PROJECT_ID)
+        
+        # Simple query to test authentication
+        query_job = client.query("SELECT 1")
+        result = list(query_job.result())
+        
+        return {
+            "status": "success",
+            "message": "Successfully connected to BigQuery",
+            "project_id": PROJECT_ID,
+            "dataset_id": DATASET_ID,
+            "model_id": MODEL_ID
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e),
+            "project_id": PROJECT_ID,
+            "dataset_id": DATASET_ID,
+            "model_id": MODEL_ID
+        }
+
 @app.post("/predict", response_model=PredictionResponse)
 async def predict(request: PredictionRequest):
     try:
-        # Initialize BigQuery client
+        # Initialize BigQuery client without explicit credentials
+        # In Cloud Run, this will use the service account assigned to the service
         client = bigquery.Client(project=PROJECT_ID)
         
         # Extract parameters

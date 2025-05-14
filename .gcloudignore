@@ -1,4 +1,7 @@
-# Python
+# This .gcloudignore file specifies which files to skip when uploading to Google Cloud
+# Similar to .gitignore but specifically for Google Cloud deployments
+
+# Python artifacts and cache
 __pycache__/
 *.py[cod]
 *$py.class
@@ -35,14 +38,7 @@ ENV/
 .git
 .gitignore
 
-# Credentials
-*-key.json
-credentials.json
-credentials/
 
-# Docker
-Dockerfile
-.dockerignore
 
 # Tests
 test_*.py 
