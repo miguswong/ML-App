@@ -1,0 +1,30 @@
+steps:
+# Build the container image
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/unemployment-api:$COMMIT_SHA', '.']
+  
+# Push the container image to Container Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/unemployment-api:$COMMIT_SHA']
+  
+# Deploy container image to Cloud Run
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+  - 'run'
+  - 'deploy'
+  - 'unemployment-api'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/unemployment-api:$COMMIT_SHA'
+  - '--region'
+  - 'us-central1'
+  - '--platform'
+  - 'managed'
+  - '--allow-unauthenticated'
+  - '--set-env-vars'
+  - 'PROJECT_ID=msds434finalprojectmiguswong,DATASET_ID=blsdata,MODEL_ID=automl_unempl'
+
+images:
+- 'gcr.io/$PROJECT_ID/unemployment-api:$COMMIT_SHA'
+
+timeout: '1200s' 
