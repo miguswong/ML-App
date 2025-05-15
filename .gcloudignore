@@ -34,11 +34,14 @@ ENV/
 # Logs
 *.log
 
-# Git
+# Git files
 .git
 .gitignore
 
-
+# Credentials (for security)
+*-key.json
+credentials.json
+credentials/
 
 # Tests
 test_*.py 
